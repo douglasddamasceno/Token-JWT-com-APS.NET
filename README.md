@@ -4,7 +4,7 @@ A API está sendo construída com o *template* MinimalAPI do .NET 10 e segue est
 ### MinimalAPI
 API com abordagem simplificada para criação de serviços REST, com o usuo mínimo de dependências para criação de *endpoints* funcionais.
 ```powershell
-dotnet new web -o MinhaAPI
+dotnet new webapi -o MinhaAPI
 ```
 Para saber mais sobre a criação de API's mínimas, veja o artigo https://learn.microsoft.com/pt-br/aspnet/core/tutorials/min-web-api?view=aspnetcore-10.0&WT.mc_id=dotnet-35129-website&tabs=visual-studio-code.
 
