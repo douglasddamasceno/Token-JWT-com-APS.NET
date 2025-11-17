@@ -3,10 +3,52 @@ using Auth;
 using Feature;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1",
+        new OpenApiInfo
+        {
+            Title = "JWT API",
+            Version = "v1",
+            Description = "API de demonstração de autenticação JWT",
+            Contact = new OpenApiContact
+            {
+                Name = "Douglas Damasceno",
+                Email = "douglasddx@gmail.com"
+            }
+        }
+    );
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Digite 'Bearer {token}'"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
+    });
+});
 
 builder.Services.AddSingleton<JwtService>();
 
@@ -39,24 +81,22 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+// Middleware
 app.UseAuthentication();
 app.UseAuthorization();
+// app.UseHttpsRedirection();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Minha API v1");
+    });
+}
 
 app.MapLoginEndpoints();
 app.MapAdminEndpoints();
 app.MapUserEndpoints();
-
-// if (app.Environment.IsDevelopment())
-// {
-//     app.MapOpenApi();
-// }
-
-// app.UseHttpsRedirection();
-
-app.MapGet("/hello", () =>
-{
-    return TypedResults.Ok("Hello World");
-})
-.WithName("Hello");
 
 app.Run();
